@@ -37,5 +37,5 @@ class ImageSubWindow(QMdiSubWindow):
         else:
             image = QImage(image_data, width, height, 3 * width, QImage.Format_BGR888)
         self.pixmap = QPixmap(image)
-        self.setFixedSize(self.pixmap.width() + 20, self.pixmap.height() + 40)
+        self.setFixedSize(self.pixmap.width() + 10, self.pixmap.height() + 30)
         self.label_image.setPixmap(self.pixmap)

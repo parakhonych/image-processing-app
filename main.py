@@ -28,6 +28,9 @@ class MainWindow(QMainWindow, UiMainWindow):
         self.actionCascade.triggered.connect(self.mdiArea.cascadeSubWindows)
         self.actionDuplicate.triggered.connect(self.duplicate_window)
         self.actionRename.triggered.connect(self.rename_window)
+        self.actionZoom_In.triggered.connect(lambda: self.zoom(0.1))
+        self.actionZoom_Out.triggered.connect(lambda: self.zoom(-0.1))
+        self.actionZoom_Off.triggered.connect(lambda: self.zoom(0))
 
     def __add_window(self, image_name, image_data):
         self.window_id += 1
@@ -80,12 +83,12 @@ class MainWindow(QMainWindow, UiMainWindow):
             self.__add_window(duplicate_dialog.new_name, self.active_window.data)
         self.setDisabled(False)
 
-
-
-
-
-
-
+    def zoom(self, scale):
+        if self.active_window.sub_window.scale + scale == self.active_window.sub_window.scale:
+            self.active_window.sub_window.scale = 1
+        else:
+            self.active_window.sub_window.scale = self.active_window.sub_window.scale + scale
+        self.active_window.sub_window.update_window()
 
 
 if __name__ == '__main__':

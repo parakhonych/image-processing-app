@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import QLabel, QMdiSubWindow
 from PyQt5.QtGui import QPixmap, QImage
 
-BYTES_FORMAT = {
+FORMATS = {
     1: QImage.Format_Grayscale8,
     2: QImage.Format_Grayscale16,
 }
@@ -25,17 +25,21 @@ class ImageSubWindow(QMdiSubWindow):
         self.window_id = window_id
         self.label_image = QLabel()
         self.pixmap = None
+        self.image_data = image_data
+        self.gray = gray
+        self.scale = 1
         self.setWidget(self.label_image)
         self.setWindowTitle(image_name)
-        self.update_window(image_data, gray)
+        self.update_window()
 
-    def update_window(self, image_data, gray):
-        height, width = image_data.shape[:2]
-        if gray:
-            pixel_bytes = image_data.dtype.itemsize
-            image = QImage(image_data, width, height, width, BYTES_FORMAT[pixel_bytes])
+
+    def update_window(self):
+        height, width = self.image_data.shape[:2]
+        if self.gray:
+            image = QImage(self.image_data, width, height, width, FORMATS[self.image_data.dtype.itemsize])
         else:
-            image = QImage(image_data, width, height, 3 * width, QImage.Format_BGR888)
+            image = QImage(self.image_data, width, height, 3 * width, QImage.Format_BGR888)
         self.pixmap = QPixmap(image)
+        self.pixmap = self.pixmap.scaled(self.scale * self.pixmap.size())
         self.setFixedSize(self.pixmap.width() + 10, self.pixmap.height() + 30)
         self.label_image.setPixmap(self.pixmap)

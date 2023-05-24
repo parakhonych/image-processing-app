@@ -1,9 +1,29 @@
 import cv2
 from sys import argv
-from PyQt5.QtWidgets import QMainWindow, QApplication, QFileDialog,QDialog
+from PyQt5.QtWidgets import QMainWindow, QApplication, QFileDialog,QMessageBox
 from main_window import UiMainWindow
 from sub_window import Image
 from rename import Rename
+
+
+def check_active_window(method):
+    def wrapper(self):
+        if not self.active_window:
+            message = "To perform this function, you should first open any picture. \n Follow these steps File -> Open"
+            QMessageBox.warning(self, "Warning", message)
+            return
+        method(self)
+    return wrapper
+
+
+def check_active_window_lambda(method):
+    def wrapper(self, scale):
+        if not self.active_window:
+            message = "To perform this function, you should first open any picture. \n Follow these steps File -> Open"
+            QMessageBox.warning(self, "Warning", message)
+            return
+        method(self, scale)
+    return wrapper
 
 
 class MainWindow(QMainWindow, UiMainWindow):
@@ -52,6 +72,7 @@ class MainWindow(QMainWindow, UiMainWindow):
             image_data = cv2.imread(file_path, -1)
             self.__add_window(image_name, image_data)
 
+    @check_active_window
     def save(self):
         file_path, _ = QFileDialog.getSaveFileName(self, "Save image", self.active_window.name, "All Files (*);;")
         if not file_path:
@@ -69,6 +90,7 @@ class MainWindow(QMainWindow, UiMainWindow):
         cap.release()
         cv2.destroyAllWindows()
 
+    @check_active_window
     def rename_window(self):
         rename_dialog = Rename(self.active_window.name, 0)
         self.setDisabled(True)
@@ -76,6 +98,7 @@ class MainWindow(QMainWindow, UiMainWindow):
             self.active_window.sub_window.setWindowTitle(rename_dialog.new_name)
         self.setDisabled(False)
 
+    @check_active_window
     def duplicate_window(self):
         duplicate_dialog = Rename(self.active_window.name, 1)
         self.setDisabled(True)
@@ -83,6 +106,7 @@ class MainWindow(QMainWindow, UiMainWindow):
             self.__add_window(duplicate_dialog.new_name, self.active_window.data)
         self.setDisabled(False)
 
+    @check_active_window_lambda
     def zoom(self, scale):
         if self.active_window.sub_window.scale + scale == self.active_window.sub_window.scale:
             self.active_window.sub_window.scale = 1

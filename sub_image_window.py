@@ -1,9 +1,8 @@
 from PyQt5.QtWidgets import QLabel, QMdiSubWindow
 from PyQt5.QtGui import QPixmap, QImage
-
+from sub_histogram_window import calc_hist_color
 FORMATS = {
-    1: QImage.Format_Grayscale8,
-    2: QImage.Format_Grayscale16,
+    1: QImage.Format_Grayscale8
 }
 
 
@@ -16,7 +15,13 @@ class Image:
         self.sub_window = ImageSubWindow(window_id, image_name, image_data, self.gray)
 
     def __is_gray(self) -> bool:
-        return len(self.data.shape) == 2
+        if len(self.data.shape) < 3:
+            return True
+        elif len(self.data.shape) == 3:
+            histogram = calc_hist_color(self.data)
+            if (histogram['b'] == histogram['r']).all() and (histogram['r'] == histogram['g']).all():
+                return True
+        return False
 
 
 class ImageSubWindow(QMdiSubWindow):
@@ -32,10 +37,9 @@ class ImageSubWindow(QMdiSubWindow):
         self.setWindowTitle(image_name)
         self.update_window()
 
-
     def update_window(self):
         height, width = self.image_data.shape[:2]
-        if self.gray:
+        if self.gray and len(self.image_data.shape) < 3:
             image = QImage(self.image_data, width, height, width, FORMATS[self.image_data.dtype.itemsize])
         else:
             image = QImage(self.image_data, width, height, 3 * width, QImage.Format_BGR888)

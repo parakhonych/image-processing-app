@@ -1,9 +1,10 @@
 import cv2
 from sys import argv
 from PyQt5.QtWidgets import QMainWindow, QApplication, QFileDialog,QMessageBox
-from main_window import UiMainWindow
-from sub_window import Image
-from rename import Rename
+from ui_main_window import UiMainWindow
+from sub_image_window import Image
+from d_textinput import TextInput
+from sub_histogram_window import SubHistogram, SubHistogramList
 
 
 def check_active_window(method):
@@ -52,6 +53,10 @@ class MainWindow(QMainWindow, UiMainWindow):
         self.actionZoom_Out.triggered.connect(lambda: self.zoom(-0.1))
         self.actionZoom_Off.triggered.connect(lambda: self.zoom(0))
 
+        # Analyzing menu
+
+        self.actionHistogram.triggered.connect(self.histogram)
+
     def __add_window(self, image_name, image_data):
         self.window_id += 1
         window = Image(self.window_id, image_name, image_data)
@@ -92,15 +97,16 @@ class MainWindow(QMainWindow, UiMainWindow):
 
     @check_active_window
     def rename_window(self):
-        rename_dialog = Rename(self.active_window.name, 0)
+        rename_dialog = TextInput(self.active_window.name, "Rename")
         self.setDisabled(True)
         if rename_dialog.exec():
             self.active_window.sub_window.setWindowTitle(rename_dialog.new_name)
+            self.active_window.name = rename_dialog.new_name
         self.setDisabled(False)
 
     @check_active_window
     def duplicate_window(self):
-        duplicate_dialog = Rename(self.active_window.name, 1)
+        duplicate_dialog = TextInput(self.active_window.name, "Duplicate")
         self.setDisabled(True)
         if duplicate_dialog.exec():
             self.__add_window(duplicate_dialog.new_name, self.active_window.data)
@@ -113,6 +119,14 @@ class MainWindow(QMainWindow, UiMainWindow):
         else:
             self.active_window.sub_window.scale = self.active_window.sub_window.scale + scale
         self.active_window.sub_window.update_window()
+
+    @check_active_window
+    def histogram(self):
+        hist = SubHistogram(self.window_id + 1, self.active_window)
+        self.mdiArea.addSubWindow(hist)
+        self.window_id = self.window_id + 2
+        self.mdiArea.addSubWindow(hist.histogram_list)
+        hist.show()
 
 
 if __name__ == '__main__':

@@ -149,7 +149,16 @@ class MainWindow(QMainWindow, UiMainWindow):
         self.__add_window("BGR to Grayscale " + self.active_window.name,
                           cv2.cvtColor(self.active_window.data, cv2.COLOR_BGR2HSV))
 
+    @check_active_window
+    def resizing(self):
+        self.__add_window("Size 256 x 256 " + self.active_window.name, cv2.resize(self.active_window.data, (256, 256)))
 
+    @check_active_window
+    def splitting(self):
+        blue, green, red = cv2.split(self.active_window.data)
+        self.add_window("Blue channel " + self.active_window.name, blue)
+        self.add_window("Green channel " + self.active_window.name, green)
+        self.add_window("Red channel " + self.active_window.name, red)
 
 
 if __name__ == '__main__':

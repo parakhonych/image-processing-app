@@ -1,10 +1,10 @@
 import cv2
 from sys import argv
-from PyQt5.QtWidgets import QMainWindow, QApplication, QFileDialog,QMessageBox
+from PyQt5.QtWidgets import QMainWindow, QApplication, QFileDialog, QMessageBox
 from ui_main_window import UiMainWindow
 from sub_image_window import Image
-from d_textinput import TextInput
-from sub_histogram_window import SubHistogram, SubHistogramList
+from d_text_input import TextInput
+from sub_histogram_window import SubHistogram
 
 
 def check_active_window(method):
@@ -53,8 +53,14 @@ class MainWindow(QMainWindow, UiMainWindow):
         self.actionZoom_Out.triggered.connect(lambda: self.zoom(-0.1))
         self.actionZoom_Off.triggered.connect(lambda: self.zoom(0))
 
-        # Analyzing menu
+        # Processing menu
+        self.actionBGR_Grayscale.triggered.connect(self.bgr2grayscale)
+        self.actionBGR_RGB.triggered.connect(self.bgr2rgb)
+        self.actionBGR_HSV.triggered.connect(self.bgr2hsv)
+        self.actionResize.triggered.connect(self.resizing)
+        #self.actionSplitting_into_channels.triggered.connect(self.splitting)
 
+        # Analyzing menu
         self.actionHistogram.triggered.connect(self.histogram)
 
     def __add_window(self, image_name, image_data):
@@ -127,6 +133,23 @@ class MainWindow(QMainWindow, UiMainWindow):
         self.window_id = self.window_id + 2
         self.mdiArea.addSubWindow(hist.histogram_list)
         hist.show()
+
+    @check_active_window
+    def bgr2grayscale(self):
+        self.__add_window("BGR to Grayscale " + self.active_window.name,
+                          cv2.cvtColor(self.active_window.data, cv2.COLOR_BGR2GRAY))
+
+    @check_active_window
+    def bgr2rgb(self):
+        self.__add_window("BGR to Grayscale " + self.active_window.name,
+                          cv2.cvtColor(self.active_window.data, cv2.COLOR_BGR2RGB))
+
+    @check_active_window
+    def bgr2hsv(self):
+        self.__add_window("BGR to Grayscale " + self.active_window.name,
+                          cv2.cvtColor(self.active_window.data, cv2.COLOR_BGR2HSV))
+
+
 
 
 if __name__ == '__main__':

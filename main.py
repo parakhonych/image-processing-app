@@ -1,10 +1,12 @@
 import cv2
+import numpy as np
 from sys import argv
 from PyQt5.QtWidgets import QMainWindow, QApplication, QFileDialog, QMessageBox
 from ui_main_window import UiMainWindow
 from sub_image_window import Image
 from d_text_input import TextInput
 from sub_histogram_window import SubHistogram
+from d_range_slider import RangeSlider
 
 
 def check_active_window(method):
@@ -58,7 +60,8 @@ class MainWindow(QMainWindow, UiMainWindow):
         self.actionBGR_RGB.triggered.connect(self.bgr2rgb)
         self.actionBGR_HSV.triggered.connect(self.bgr2hsv)
         self.actionResize.triggered.connect(self.resizing)
-        #self.actionSplitting_into_channels.triggered.connect(self.splitting)
+        self.actionSplitting_into_channels.triggered.connect(self.splitting)
+        self.actionStretching.triggered.connect(self.stretching)
 
         # Analyzing menu
         self.actionHistogram.triggered.connect(self.histogram)
@@ -156,9 +159,14 @@ class MainWindow(QMainWindow, UiMainWindow):
     @check_active_window
     def splitting(self):
         blue, green, red = cv2.split(self.active_window.data)
-        self.add_window("Blue channel " + self.active_window.name, blue)
-        self.add_window("Green channel " + self.active_window.name, green)
-        self.add_window("Red channel " + self.active_window.name, red)
+        self.__add_window("Blue channel " + self.active_window.name, blue)
+        self.__add_window("Green channel " + self.active_window.name, green)
+        self.__add_window("Red channel " + self.active_window.name, red)
+
+    def stretching(self):
+        range_slider = RangeSlider(self.active_window.data)
+        if range_slider.exec_():
+            self.__add_window("Stretching " + self.active_window.name, range_slider.image_data)
 
 
 if __name__ == '__main__':

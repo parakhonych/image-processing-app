@@ -1,5 +1,4 @@
 import cv2
-import numpy as np
 from sys import argv
 from PyQt5.QtWidgets import QMainWindow, QApplication, QFileDialog, QMessageBox
 from ui_main_window import UiMainWindow
@@ -7,6 +6,8 @@ from sub_image_window import Image
 from d_text_input import TextInput
 from sub_histogram_window import SubHistogram
 from d_range_slider import RangeSlider
+from numpy import zeros, array
+from numpy.ma import masked_equal
 
 
 def check_active_window(method):
@@ -17,7 +18,6 @@ def check_active_window(method):
             return
         method(self)
     return wrapper
-
 
 def check_active_window_lambda(method):
     def wrapper(self, scale):
@@ -62,6 +62,7 @@ class MainWindow(QMainWindow, UiMainWindow):
         self.actionResize.triggered.connect(self.resizing)
         self.actionSplitting_into_channels.triggered.connect(self.splitting)
         self.actionStretching.triggered.connect(self.stretching)
+        self.actionEqualization.triggered.connect(self.equalization)
 
         # Analyzing menu
         self.actionHistogram.triggered.connect(self.histogram)
@@ -163,10 +164,34 @@ class MainWindow(QMainWindow, UiMainWindow):
         self.__add_window("Green channel " + self.active_window.name, green)
         self.__add_window("Red channel " + self.active_window.name, red)
 
+    @check_active_window
     def stretching(self):
-        range_slider = RangeSlider(self.active_window.data)
+        if not self.active_window.gray:
+            image_data = cv2.cvtColor(self.active_window.data, cv2.COLOR_BGR2GRAY)
+        else:
+            image_data = self.active_window.data
+        range_slider = RangeSlider(image_data)
         if range_slider.exec_():
             self.__add_window("Stretching " + self.active_window.name, range_slider.image_data)
+
+    @check_active_window
+    def equalization(self):
+        hist = zeros(256)
+        for h in range(self.active_window.data.shape[0]):
+            for w in range(self.active_window.data.shape[1]):
+                pixel = self.active_window.data[h, w]
+                hist[pixel] += 1
+        hist = iter(hist)
+        new_hist = [next(hist)]
+        for value in hist:
+            new_hist.append(new_hist[-1] + value)
+        new_hist = array(new_hist)
+        cumulative_sum = masked_equal(new_hist, 0)
+        cumulative_sum_min = cumulative_sum.min()
+        cumulative_sum_max = cumulative_sum.max()
+        new_hist = ((new_hist - cumulative_sum_min) * 255) / (cumulative_sum_max - cumulative_sum_min)
+        new_hist = new_hist.astype('uint8')
+        self.__add_window("Equalization of " + self.active_window.name, new_hist[self.active_window.data])
 
 
 if __name__ == '__main__':

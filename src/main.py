@@ -1,15 +1,31 @@
+import os
+import sys
 import cv2
 from sys import argv
 from PyQt5.QtWidgets import QMainWindow, QApplication, QFileDialog, QMessageBox
-from ui_main_window import UiMainWindow
-from sub_image_window import Image
-from dg_text_input import TextInput
-from sub_histogram_window import SubHistogram
-from dg_range_slider_stretching import HistogramManipulationStretching
+from src.UI.ui_main_window import UiMainWindow
+from src.subWindows.sub_image_window import Image
+from src.Dialogs import TextInput
+from src.subWindows.sub_histogram_window import SubHistogram
+from src.Dialogs import HistogramManipulationStretching
 from numpy import zeros, array
 from numpy.ma import masked_equal
-from dg_range_slider_pothresholding import PointOperationThresholding
-import numpy as np
+from src.Dialogs import PointOperationThresholding
+
+main_directory = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(main_directory)
+
+
+def check_color_window(method):
+    def wrapper(self):
+        if self.active_window.gray:
+            message = "Only color images are required for this function.\n" \
+                      "You can open it with the following steps: File -> Open"
+            QMessageBox.warning(self, "Warning", message)
+            return
+        method(self)
+    return wrapper
+
 
 def check_active_window(method):
     def wrapper(self):
@@ -19,6 +35,7 @@ def check_active_window(method):
             return
         method(self)
     return wrapper
+
 
 def check_active_window_lambda(method):
     def wrapper(self, scale):
@@ -170,6 +187,7 @@ class MainWindow(QMainWindow, UiMainWindow):
         self.__add_window("Size 256 x 256 " + self.active_window.name, cv2.resize(self.active_window.data, (256, 256)))
 
     @check_active_window
+    @check_color_window
     def splitting(self):
         blue, green, red = cv2.split(self.active_window.data)
         self.__add_window("Blue channel " + self.active_window.name, blue)

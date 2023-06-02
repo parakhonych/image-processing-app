@@ -1,8 +1,9 @@
 from PyQt5.QtWidgets import QDialog
-from ui_range_slider import UiRangeSlider
+from src.UI.ui_range_slider import UiRangeSlider
 from PyQt5.QtGui import QPixmap, QImage
 from numpy import zeros_like
 import cv2
+
 FORMATS = {
     1: QImage.Format_Grayscale8
 }

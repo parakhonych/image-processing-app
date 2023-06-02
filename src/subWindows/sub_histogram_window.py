@@ -1,6 +1,6 @@
 from numpy import zeros
 from PyQt5.QtWidgets import QMdiSubWindow, QTableWidgetItem
-from ui_histogram import UiHistogram, UiHistogramList
+from src.UI.ui_histogram import UiHistogram, UiHistogramList
 
 COLORS = {
     'b': 'blue',

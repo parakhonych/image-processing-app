@@ -1,6 +1,7 @@
 from PyQt5.QtWidgets import QLabel, QMdiSubWindow
 from PyQt5.QtGui import QPixmap, QImage
-from sub_histogram_window import calc_hist_color
+from .sub_histogram_window import calc_hist_color
+
 FORMATS = {
     1: QImage.Format_Grayscale8
 }

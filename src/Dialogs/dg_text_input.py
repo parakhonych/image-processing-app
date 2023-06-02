@@ -1,6 +1,5 @@
 from PyQt5.QtWidgets import QDialog
-from ui_text_input import UiTextInput
-
+from src.UI.ui_text_input import UiTextInput
 
 class TextInput(QDialog, UiTextInput):
     def __init__(self, name, text):

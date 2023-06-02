@@ -18,12 +18,10 @@ class UiRangeSlider:
         layout.addWidget(self.label_max)
         layout.addWidget(self.label_image)
 
-        buttons = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
+        self.buttons = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
+        self.buttons.accepted.connect(self.accept)
+        self.buttons.rejected.connect(self.reject)
 
-        buttons.accepted.connect(self.stretching_image)
-        buttons.rejected.connect(self.reject)
-
-        layout.addWidget(buttons)
+        layout.addWidget(self.buttons)
         self.setLayout(layout)
 
-        self.slider_max.valueChanged.connect(self.count_stretching)

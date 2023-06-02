@@ -3,12 +3,13 @@ from sys import argv
 from PyQt5.QtWidgets import QMainWindow, QApplication, QFileDialog, QMessageBox
 from ui_main_window import UiMainWindow
 from sub_image_window import Image
-from d_text_input import TextInput
+from dg_text_input import TextInput
 from sub_histogram_window import SubHistogram
-from d_range_slider import RangeSlider
+from dg_range_slider_stretching import HistogramManipulationStretching
 from numpy import zeros, array
 from numpy.ma import masked_equal
-
+from dg_range_slider_pothresholding import PointOperationThresholding
+import numpy as np
 
 def check_active_window(method):
     def wrapper(self):
@@ -56,13 +57,24 @@ class MainWindow(QMainWindow, UiMainWindow):
         self.actionZoom_Off.triggered.connect(lambda: self.zoom(0))
 
         # Processing menu
+        # Conversation
         self.actionBGR_Grayscale.triggered.connect(self.bgr2grayscale)
         self.actionBGR_RGB.triggered.connect(self.bgr2rgb)
         self.actionBGR_HSV.triggered.connect(self.bgr2hsv)
+
         self.actionResize.triggered.connect(self.resizing)
+
         self.actionSplitting_into_channels.triggered.connect(self.splitting)
+
+        # Histogram manipulation
+
         self.actionStretching.triggered.connect(self.stretching)
         self.actionEqualization.triggered.connect(self.equalization)
+
+        # Point operation
+
+        self.actionNegation.triggered.connect(self.negation)
+        self.actionThresholding.triggered.connect(self.point_operation_thresholding)
 
         # Analyzing menu
         self.actionHistogram.triggered.connect(self.histogram)
@@ -166,11 +178,8 @@ class MainWindow(QMainWindow, UiMainWindow):
 
     @check_active_window
     def stretching(self):
-        if not self.active_window.gray:
-            image_data = cv2.cvtColor(self.active_window.data, cv2.COLOR_BGR2GRAY)
-        else:
-            image_data = self.active_window.data
-        range_slider = RangeSlider(image_data)
+        image_data = self.active_window.data
+        range_slider = HistogramManipulationStretching(image_data)
         if range_slider.exec_():
             self.__add_window("Stretching " + self.active_window.name, range_slider.image_data)
 
@@ -192,6 +201,19 @@ class MainWindow(QMainWindow, UiMainWindow):
         new_hist = ((new_hist - cumulative_sum_min) * 255) / (cumulative_sum_max - cumulative_sum_min)
         new_hist = new_hist.astype('uint8')
         self.__add_window("Equalization of " + self.active_window.name, new_hist[self.active_window.data])
+
+    def negation(self):
+        self.__add_window("Negation of" + self.active_window.name, 255-self.active_window.data)
+
+    def point_operation_thresholding(self):
+        if not self.active_window.gray or len(self.active_window.data.shape) > 2:
+            image_data = cv2.cvtColor(self.active_window.data, cv2.COLOR_BGR2GRAY)
+        else:
+            image_data = self.active_window.data
+        range_slider = PointOperationThresholding(image_data)
+        if range_slider.exec_():
+            self.__add_window("Point operation thresholding " + self.active_window.name, range_slider.image_data)
+
 
 
 if __name__ == '__main__':

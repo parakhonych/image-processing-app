@@ -4,6 +4,7 @@ from sub_histogram_window import calc_hist_color
 FORMATS = {
     1: QImage.Format_Grayscale8
 }
+import cv2
 
 
 class Image:
@@ -20,6 +21,7 @@ class Image:
         elif len(self.data.shape) == 3:
             histogram = calc_hist_color(self.data)
             if (histogram['b'] == histogram['r']).all() and (histogram['r'] == histogram['g']).all():
+                self.data = cv2.cvtColor(self.data, cv2.COLOR_BGR2GRAY)
                 return True
         return False
 

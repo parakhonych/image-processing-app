@@ -8,7 +8,7 @@ FORMATS = {
 }
 
 
-class RangeSlider(QDialog, UiRangeSlider):
+class HistogramManipulationStretching(QDialog, UiRangeSlider):
     def __init__(self, image_data):
         super().__init__()
         self.setup_ui(self)
@@ -16,13 +16,11 @@ class RangeSlider(QDialog, UiRangeSlider):
         self.pixmap = None
         self.image_data = image_data
         self.count_stretching()
+        self.slider_max.valueChanged.connect(self.count_stretching)
 
     def update_window(self):
         height, width = self.image_data.shape[:2]
-        if len(self.image_data.shape) < 3:
-            image = QImage(self.image_data, width, height, width, FORMATS[self.image_data.dtype.itemsize])
-        else:
-            image = QImage(self.image_data, width, height, 3 * width, QImage.Format_BGR888)
+        image = QImage(self.image_data, width, height, width, FORMATS[self.image_data.dtype.itemsize])
         self.pixmap = QPixmap(image)
         self.setFixedSize(self.pixmap.width() + 10, self.pixmap.height() + 30)
         self.label_image.setPixmap(self.pixmap)
@@ -40,5 +38,3 @@ class RangeSlider(QDialog, UiRangeSlider):
         self.image_data = image_stretching
         self.update_window()
 
-    def stretching_image(self):
-        self.accept()

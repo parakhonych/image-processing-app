@@ -11,6 +11,7 @@ from numpy import zeros, array
 from numpy.ma import masked_equal
 from src.Dialogs import PointOperationThresholding
 from src.Dialogs import PointOperationPosterization
+from src.Dialogs import PointOperationPosterizationLut
 
 main_directory = os_path.dirname(os_path.abspath(__file__))
 path.append(main_directory)
@@ -93,6 +94,7 @@ class MainWindow(QMainWindow, UiMainWindow):
         self.actionNegation.triggered.connect(self.negation)
         self.actionThresholding.triggered.connect(self.point_operation_thresholding)
         self.actionPosterize.triggered.connect(self.point_operation_posterization)
+        self.actionPosterize_with_LUT.triggered.connect(self.point_operation_posterization_lut)
 
         # Analyzing menu
         self.actionHistogram.triggered.connect(self.histogram)
@@ -131,7 +133,7 @@ class MainWindow(QMainWindow, UiMainWindow):
             if cv2.waitKey(30) & 0xFF == ord('k'):
                 self.__add_window("Photo number" + str(self.window_id + 1), image)
                 break
-            cv2.imshow('img', image)
+            cv2.imshow('live mode', image)
         cap.release()
         cv2.destroyAllWindows()
 
@@ -168,7 +170,8 @@ class MainWindow(QMainWindow, UiMainWindow):
         self.mdiArea.addSubWindow(hist.histogram_list)
         hist.show()
 
-    def __conversation_to_grayscale(self, image_data):
+    @staticmethod
+    def __conversation_to_grayscale(image_data):
         return cv2.cvtColor(image_data, cv2.COLOR_BGR2GRAY)
 
     @check_active_window
@@ -252,7 +255,16 @@ class MainWindow(QMainWindow, UiMainWindow):
             image_data = self.__conversation_to_grayscale(image_data)
         range_slider = PointOperationPosterization(image_data)
         if range_slider.exec_():
-            self.__add_window("Point operation thresholding " + self.active_window.name, range_slider.image_data)
+            self.__add_window("Point operation posterization " + self.active_window.name, range_slider.image_data)
+
+    @check_active_window
+    def point_operation_posterization_lut(self):
+        image_data = self.active_window.data
+        if len(self.active_window.data.shape) > 2:
+            image_data = self.__conversation_to_grayscale(image_data)
+        range_slider = PointOperationPosterizationLut(image_data)
+        if range_slider.exec_():
+            self.__add_window("Point operation posterization LUT " + self.active_window.name, range_slider.image_data)
 
 
 if __name__ == '__main__':

@@ -1,7 +1,6 @@
-import os
-import sys
+from os import path as os_path
 import cv2
-from sys import argv
+from sys import argv, path
 from PyQt5.QtWidgets import QMainWindow, QApplication, QFileDialog, QMessageBox
 from src.UI.ui_main_window import UiMainWindow
 from src.subWindows.sub_image_window import Image
@@ -11,9 +10,10 @@ from src.Dialogs import HistogramManipulationStretching
 from numpy import zeros, array
 from numpy.ma import masked_equal
 from src.Dialogs import PointOperationThresholding
+from src.Dialogs import PointOperationPosterization
 
-main_directory = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(main_directory)
+main_directory = os_path.dirname(os_path.abspath(__file__))
+path.append(main_directory)
 
 
 def check_color_window(method):
@@ -92,6 +92,7 @@ class MainWindow(QMainWindow, UiMainWindow):
 
         self.actionNegation.triggered.connect(self.negation)
         self.actionThresholding.triggered.connect(self.point_operation_thresholding)
+        self.actionPosterize.triggered.connect(self.point_operation_posterization)
 
         # Analyzing menu
         self.actionHistogram.triggered.connect(self.histogram)
@@ -125,7 +126,7 @@ class MainWindow(QMainWindow, UiMainWindow):
 
     def live(self):
         cap = cv2.VideoCapture(0)
-        while(True):
+        while True:
             _, image = cap.read()
             if cv2.waitKey(30) & 0xFF == ord('k'):
                 self.__add_window("Photo number" + str(self.window_id + 1), image)
@@ -167,10 +168,13 @@ class MainWindow(QMainWindow, UiMainWindow):
         self.mdiArea.addSubWindow(hist.histogram_list)
         hist.show()
 
+    def __conversation_to_grayscale(self, image_data):
+        return cv2.cvtColor(image_data, cv2.COLOR_BGR2GRAY)
+
     @check_active_window
     def bgr2grayscale(self):
         self.__add_window("BGR to Grayscale " + self.active_window.name,
-                          cv2.cvtColor(self.active_window.data, cv2.COLOR_BGR2GRAY))
+                          self.__conversation_to_grayscale(self.active_window.data))
 
     @check_active_window
     def bgr2rgb(self):
@@ -197,16 +201,21 @@ class MainWindow(QMainWindow, UiMainWindow):
     @check_active_window
     def stretching(self):
         image_data = self.active_window.data
+        if len(self.active_window.data.shape) > 2:
+            image_data = self.__conversation_to_grayscale(image_data)
         range_slider = HistogramManipulationStretching(image_data)
         if range_slider.exec_():
             self.__add_window("Stretching " + self.active_window.name, range_slider.image_data)
 
     @check_active_window
     def equalization(self):
+        image_data = self.active_window.data
+        if len(self.active_window.data.shape) > 2:
+            image_data = self.__conversation_to_grayscale(image_data)
         hist = zeros(256)
-        for h in range(self.active_window.data.shape[0]):
-            for w in range(self.active_window.data.shape[1]):
-                pixel = self.active_window.data[h, w]
+        for h in range(image_data.shape[0]):
+            for w in range(image_data.shape[1]):
+                pixel = image_data[h, w]
                 hist[pixel] += 1
         hist = iter(hist)
         new_hist = [next(hist)]
@@ -218,20 +227,32 @@ class MainWindow(QMainWindow, UiMainWindow):
         cumulative_sum_max = cumulative_sum.max()
         new_hist = ((new_hist - cumulative_sum_min) * 255) / (cumulative_sum_max - cumulative_sum_min)
         new_hist = new_hist.astype('uint8')
-        self.__add_window("Equalization of " + self.active_window.name, new_hist[self.active_window.data])
+        self.__add_window("Equalization of " + self.active_window.name, new_hist[image_data])
 
+    @check_active_window
     def negation(self):
-        self.__add_window("Negation of" + self.active_window.name, 255-self.active_window.data)
+        image_data = self.active_window.data
+        if len(self.active_window.data.shape) > 2:
+            image_data = self.__conversation_to_grayscale(image_data)
+        self.__add_window("Negation of" + self.active_window.name, 255-image_data)
 
+    @check_active_window
     def point_operation_thresholding(self):
-        if not self.active_window.gray or len(self.active_window.data.shape) > 2:
-            image_data = cv2.cvtColor(self.active_window.data, cv2.COLOR_BGR2GRAY)
-        else:
-            image_data = self.active_window.data
+        image_data = self.active_window.data
+        if len(self.active_window.data.shape) > 2:
+            image_data = self.__conversation_to_grayscale(image_data)
         range_slider = PointOperationThresholding(image_data)
         if range_slider.exec_():
             self.__add_window("Point operation thresholding " + self.active_window.name, range_slider.image_data)
 
+    @check_active_window
+    def point_operation_posterization(self):
+        image_data = self.active_window.data
+        if len(self.active_window.data.shape) > 2:
+            image_data = self.__conversation_to_grayscale(image_data)
+        range_slider = PointOperationPosterization(image_data)
+        if range_slider.exec_():
+            self.__add_window("Point operation thresholding " + self.active_window.name, range_slider.image_data)
 
 
 if __name__ == '__main__':

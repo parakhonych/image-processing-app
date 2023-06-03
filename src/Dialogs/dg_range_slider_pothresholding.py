@@ -2,7 +2,6 @@ from PyQt5.QtWidgets import QDialog
 from src.UI.ui_range_slider import UiRangeSlider
 from PyQt5.QtGui import QPixmap, QImage
 from numpy import zeros_like
-import cv2
 
 FORMATS = {
     1: QImage.Format_Grayscale8
@@ -36,5 +35,5 @@ class PointOperationThresholding(QDialog, UiRangeSlider):
                 pixel = self.image_origin[h, w]
                 if pixel > value:
                     img_th[h, w] = 1
-        self.image_data = cv2.cvtColor(cv2.cvtColor(img_th*255, cv2.COLOR_BGR2RGB), cv2.COLOR_RGB2GRAY)
+        self.image_data = img_th*255
         self.update_window()

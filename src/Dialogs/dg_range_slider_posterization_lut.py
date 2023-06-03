@@ -35,8 +35,8 @@ class PointOperationPosterizationLut(QDialog, UiRangeSlider):
         bin_length = round(255 / value).astype(int)
         bins_table = arange(0, 255, round(255 / value))
         lut = []
-        for bin in range(value):
-            temp = ones(bin_length, ) * bins_table[bin]
+        for bin_value in range(value):
+            temp = ones(bin_length, ) * bins_table[bin_value]
             lut = hstack((lut, temp))
         lut = hstack((lut, ones(bin_length, ) * 255))
         img_out = lut[self.image_origin].astype('uint8')

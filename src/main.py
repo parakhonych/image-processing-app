@@ -12,6 +12,7 @@ from numpy.ma import masked_equal
 from src.Dialogs import PointOperationThresholding
 from src.Dialogs import PointOperationPosterization
 from src.Dialogs import PointOperationPosterizationLut
+from src.Dialogs import Blurring
 
 main_directory = os_path.dirname(os_path.abspath(__file__))
 path.append(main_directory)
@@ -95,6 +96,9 @@ class MainWindow(QMainWindow, UiMainWindow):
         self.actionThresholding.triggered.connect(self.point_operation_thresholding)
         self.actionPosterize.triggered.connect(self.point_operation_posterization)
         self.actionPosterize_with_LUT.triggered.connect(self.point_operation_posterization_lut)
+
+        # Local operation
+        self.actionBlur.triggered.connect(self.blurring_image)
 
         # Analyzing menu
         self.actionHistogram.triggered.connect(self.histogram)
@@ -265,6 +269,14 @@ class MainWindow(QMainWindow, UiMainWindow):
         range_slider = PointOperationPosterizationLut(image_data)
         if range_slider.exec_():
             self.__add_window("Point operation posterization LUT " + self.active_window.name, range_slider.image_data)
+
+    def blurring_image(self):
+        image_data = self.active_window.data
+        if len(self.active_window.data.shape) > 2:
+            image_data = self.__conversation_to_grayscale(image_data)
+        blur = Blurring(image_data)
+        if blur.exec_():
+            self.__add_window("Blurring " + self.active_window.name, blur.image_data)
 
 
 if __name__ == '__main__':

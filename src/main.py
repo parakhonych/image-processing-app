@@ -13,6 +13,8 @@ from src.Dialogs import PointOperationThresholding
 from src.Dialogs import PointOperationPosterization
 from src.Dialogs import PointOperationPosterizationLut
 from src.Dialogs import Blurring
+from src.Dialogs import EdgeDetection
+
 
 main_directory = os_path.dirname(os_path.abspath(__file__))
 path.append(main_directory)
@@ -99,6 +101,7 @@ class MainWindow(QMainWindow, UiMainWindow):
 
         # Local operation
         self.actionBlur.triggered.connect(self.blurring_image)
+        self.actionEdgeDetection.triggered.connect(self.edge_detection)
 
         # Analyzing menu
         self.actionHistogram.triggered.connect(self.histogram)
@@ -270,6 +273,7 @@ class MainWindow(QMainWindow, UiMainWindow):
         if range_slider.exec_():
             self.__add_window("Point operation posterization LUT " + self.active_window.name, range_slider.image_data)
 
+    @check_active_window
     def blurring_image(self):
         image_data = self.active_window.data
         if len(self.active_window.data.shape) > 2:
@@ -277,6 +281,16 @@ class MainWindow(QMainWindow, UiMainWindow):
         blur = Blurring(image_data)
         if blur.exec_():
             self.__add_window("Blurring " + self.active_window.name, blur.image_data)
+
+    @check_active_window
+    def edge_detection(self):
+        image_data = self.active_window.data
+        if len(self.active_window.data.shape) > 2:
+            image_data = self.__conversation_to_grayscale(image_data)
+        edge_detect = EdgeDetection(image_data)
+        if edge_detect.exec_():
+            self.__add_window("Edge detection " + edge_detect.comboBoxTypes.currentText(), edge_detect.image_data)
+
 
 
 if __name__ == '__main__':

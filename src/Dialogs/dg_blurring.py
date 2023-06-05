@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import QDialog
-from src.UI.ui_blurring import DialogBlurring
+from src.UI.ui_combo_boxes import ui_combo_boxes
 from PyQt5.QtGui import QPixmap, QImage
 import cv2
 
@@ -27,7 +27,7 @@ BLUR_TYPES = {
 }
 
 
-class Blurring(QDialog, DialogBlurring):
+class Blurring(QDialog, ui_combo_boxes):
     def __init__(self, image_data):
         super().__init__()
         self.setup_ui(self)
@@ -37,12 +37,12 @@ class Blurring(QDialog, DialogBlurring):
         self.image_origin = image_data
         self.fill_combo_boxes()
         self.blurring()
-        self.comboBoxBlurringTypes.currentIndexChanged.connect(self.blurring)
+        self.comboBoxTypes.currentIndexChanged.connect(self.blurring)
         self.comboBoxKernelSize.currentIndexChanged.connect(self.blurring)
 
     def fill_combo_boxes(self):
         for value in BLUR_TYPES.keys():
-            self.comboBoxBlurringTypes.addItem(value)
+            self.comboBoxTypes.addItem(value)
         for value in range(3, 10, 2):
             self.comboBoxKernelSize.addItem(f"({value} x {value})")
 
@@ -55,5 +55,5 @@ class Blurring(QDialog, DialogBlurring):
 
     def blurring(self):
         value = int(self.comboBoxKernelSize.currentText()[1])
-        self.image_data = BLUR_TYPES[self.comboBoxBlurringTypes.currentText()](self.image_origin, (value, value))
+        self.image_data = BLUR_TYPES[self.comboBoxTypes.currentText()](self.image_origin, (value, value))
         self.update_window()

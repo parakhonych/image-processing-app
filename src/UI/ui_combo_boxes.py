@@ -2,7 +2,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout, QWidget
 
 
-class DialogBlurring:
+class ui_combo_boxes:
     def setup_ui(self, Dialog):
         Dialog.setObjectName("Dialog")
         Dialog.resize(421, 205)
@@ -11,15 +11,15 @@ class DialogBlurring:
         self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
         self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.Cancel|QtWidgets.QDialogButtonBox.Ok)
         self.buttonBox.setObjectName("buttonBox")
-        self.comboBoxBlurringTypes = QtWidgets.QComboBox(Dialog)
-        self.comboBoxBlurringTypes.setGeometry(QtCore.QRect(70, 40, 141, 22))
-        self.comboBoxBlurringTypes.setObjectName("comboBox")
+        self.comboBoxTypes = QtWidgets.QComboBox(Dialog)
+        self.comboBoxTypes.setGeometry(QtCore.QRect(70, 40, 141, 22))
+        self.comboBoxTypes.setObjectName("comboBox")
         self.comboBoxKernelSize = QtWidgets.QComboBox(Dialog)
         self.comboBoxKernelSize.setGeometry(QtCore.QRect(300, 40, 61, 22))
         self.comboBoxKernelSize.setObjectName("comboBox_2")
-        self.labelBlurType = QtWidgets.QLabel(Dialog)
-        self.labelBlurType.setGeometry(QtCore.QRect(10, 40, 49, 16))
-        self.labelBlurType.setObjectName("labelBlurType")
+        self.labelType = QtWidgets.QLabel(Dialog)
+        self.labelType.setGeometry(QtCore.QRect(10, 40, 49, 16))
+        self.labelType.setObjectName("labelBlurType")
         self.label_kernel_size = QtWidgets.QLabel(Dialog)
         self.label_kernel_size.setGeometry(QtCore.QRect(220, 40, 71, 16))
         self.label_kernel_size.setObjectName("label_2")
@@ -29,8 +29,8 @@ class DialogBlurring:
 
         layout_combo_box = QHBoxLayout()
 
-        layout_combo_box.addWidget(self.labelBlurType)
-        layout_combo_box.addWidget(self.comboBoxBlurringTypes)
+        layout_combo_box.addWidget(self.labelType)
+        layout_combo_box.addWidget(self.comboBoxTypes)
         layout_combo_box.addWidget(self.label_kernel_size)
         layout_combo_box.addWidget(self.comboBoxKernelSize)
 
@@ -49,7 +49,7 @@ class DialogBlurring:
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate
         Dialog.setWindowTitle(_translate("Dialog", "Dialog"))
-        self.labelBlurType.setText(_translate("Dialog", "Blur Type"))
+        self.labelType.setText(_translate("Dialog", "Blur Type"))
         self.label_kernel_size.setText(_translate("Dialog", "Kernel Size:"))
 
 

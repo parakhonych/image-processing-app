@@ -14,7 +14,7 @@ from src.Dialogs import PointOperationPosterization
 from src.Dialogs import PointOperationPosterizationLut
 from src.Dialogs import Blurring
 from src.Dialogs import EdgeDetection
-
+from src.Dialogs import LinearSharpening
 
 main_directory = os_path.dirname(os_path.abspath(__file__))
 path.append(main_directory)
@@ -102,6 +102,7 @@ class MainWindow(QMainWindow, UiMainWindow):
         # Local operation
         self.actionBlur.triggered.connect(self.blurring_image)
         self.actionEdgeDetection.triggered.connect(self.edge_detection)
+        self.actionLinearSharpening.triggered.connect(self.linear_sharpening_image)
 
         # Analyzing menu
         self.actionHistogram.triggered.connect(self.histogram)
@@ -289,7 +290,20 @@ class MainWindow(QMainWindow, UiMainWindow):
             image_data = self.__conversation_to_grayscale(image_data)
         edge_detect = EdgeDetection(image_data)
         if edge_detect.exec_():
-            self.__add_window("Edge detection " + edge_detect.comboBoxTypes.currentText(), edge_detect.image_data)
+            self.__add_window("Edge detection " + edge_detect.comboBoxTypes.currentText() + self.active_window.name, edge_detect.image_data)
+
+    @check_active_window
+    def linear_sharpening_image(self):
+        image_data = self.active_window.data
+        if len(self.active_window.data.shape) > 2:
+            image_data = self.__conversation_to_grayscale(image_data)
+        lin_sharp = LinearSharpening(image_data)
+        if lin_sharp.exec_():
+            self.__add_window("Linear sharpening  " + lin_sharp.comboBoxTypes.currentText() + " "
+                              + self.active_window.name, lin_sharp.image_data)
+
+
+
 
 
 

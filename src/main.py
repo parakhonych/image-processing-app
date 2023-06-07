@@ -1,6 +1,7 @@
-from os import path as os_path
 import cv2
+from os import path as os_path
 from sys import argv, path
+path.append(os_path.abspath(os_path.join(os_path.dirname(__file__), os_path.pardir)))
 from PyQt5.QtWidgets import QMainWindow, QApplication, QFileDialog, QMessageBox
 from src.UI.ui_main_window import UiMainWindow
 from src.subWindows.sub_image_window import Image
@@ -16,8 +17,7 @@ from src.Dialogs import Blurring
 from src.Dialogs import EdgeDetection
 from src.Dialogs import LinearSharpening
 
-main_directory = os_path.dirname(os_path.abspath(__file__))
-path.append(main_directory)
+
 
 
 def check_color_window(method):

@@ -221,24 +221,31 @@ class MainWindow(QMainWindow, UiMainWindow):
     @check_active_window
     def equalization(self):
         image_data = self.active_window.data
-        if len(self.active_window.data.shape) > 2:
-            image_data = self.__conversation_to_grayscale(image_data)
-        hist = zeros(256)
-        for h in range(image_data.shape[0]):
-            for w in range(image_data.shape[1]):
-                pixel = image_data[h, w]
-                hist[pixel] += 1
-        hist = iter(hist)
-        new_hist = [next(hist)]
-        for value in hist:
-            new_hist.append(new_hist[-1] + value)
-        new_hist = array(new_hist)
-        cumulative_sum = masked_equal(new_hist, 0)
-        cumulative_sum_min = cumulative_sum.min()
-        cumulative_sum_max = cumulative_sum.max()
-        new_hist = ((new_hist - cumulative_sum_min) * 255) / (cumulative_sum_max - cumulative_sum_min)
-        new_hist = new_hist.astype('uint8')
-        self.__add_window("Equalization of " + self.active_window.name, new_hist[image_data])
+        if self.active_window.gray:
+            hist = zeros(256)
+            for h in range(image_data.shape[0]):
+                for w in range(image_data.shape[1]):
+                    pixel = image_data[h, w]
+                    hist[pixel] += 1
+            hist = iter(hist)
+            new_hist = [next(hist)]
+            for value in hist:
+                new_hist.append(new_hist[-1] + value)
+            new_hist = array(new_hist)
+            cumulative_sum = masked_equal(new_hist, 0)
+            cumulative_sum_min = cumulative_sum.min()
+            cumulative_sum_max = cumulative_sum.max()
+            new_hist = ((new_hist - cumulative_sum_min) * 255) / (cumulative_sum_max - cumulative_sum_min)
+            new_hist = new_hist.astype('uint8')
+            self.__add_window("Equalization of " + self.active_window.name, new_hist[image_data])
+        else:
+            b, g, r = cv2.split(image_data)
+            b_eq = cv2.equalizeHist(b)
+            g_eq = cv2.equalizeHist(g)
+            r_eq = cv2.equalizeHist(r)
+            equalized_image = cv2.merge((b_eq, g_eq, r_eq))
+            self.__add_window("Equalization of " + self.active_window.name, equalized_image)
+
 
     @check_active_window
     def negation(self):

@@ -48,7 +48,10 @@ class Blurring(QDialog, ui_combo_boxes):
 
     def update_window(self):
         height, width = self.image_data.shape[:2]
-        image = QImage(self.image_data, width, height, width, FORMATS[self.image_data.dtype.itemsize])
+        if len(self.image_data.shape) < 3:
+            image = QImage(self.image_data, width, height, width, FORMATS[self.image_data.dtype.itemsize])
+        else:
+            image = QImage(self.image_data, width, height, 3 * width, QImage.Format_BGR888)
         self.pixmap = QPixmap(image)
         self.setFixedSize(self.pixmap.width() + 10, self.pixmap.height() + 30)
         self.label_image.setPixmap(self.pixmap)

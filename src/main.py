@@ -179,13 +179,13 @@ class MainWindow(QMainWindow, UiMainWindow):
         hist.show()
 
     @staticmethod
-    def __conversation_to_grayscale(image_data):
+    def __conversiton_to_grayscale(image_data):
         return cv2.cvtColor(image_data, cv2.COLOR_BGR2GRAY)
 
     @check_active_window
     def bgr2grayscale(self):
         self.__add_window("BGR to Grayscale " + self.active_window.name,
-                          self.__conversation_to_grayscale(self.active_window.data))
+                          self.__conversiton_to_grayscale(self.active_window.data))
 
     @check_active_window
     def bgr2rgb(self):
@@ -213,7 +213,7 @@ class MainWindow(QMainWindow, UiMainWindow):
     def stretching(self):
         image_data = self.active_window.data
         if len(self.active_window.data.shape) > 2:
-            image_data = self.__conversation_to_grayscale(image_data)
+            image_data = self.__conversiton_to_grayscale(image_data)
         range_slider = HistogramManipulationStretching(image_data)
         if range_slider.exec_():
             self.__add_window("Stretching " + self.active_window.name, range_slider.image_data)
@@ -251,14 +251,14 @@ class MainWindow(QMainWindow, UiMainWindow):
     def negation(self):
         image_data = self.active_window.data
         if len(self.active_window.data.shape) > 2:
-            image_data = self.__conversation_to_grayscale(image_data)
+            image_data = self.__conversiton_to_grayscale(image_data)
         self.__add_window("Negation of" + self.active_window.name, 255-image_data)
 
     @check_active_window
     def point_operation_thresholding(self):
         image_data = self.active_window.data
         if len(self.active_window.data.shape) > 2:
-            image_data = self.__conversation_to_grayscale(image_data)
+            image_data = self.__conversiton_to_grayscale(image_data)
         range_slider = PointOperationThresholding(image_data)
         if range_slider.exec_():
             self.__add_window("Point operation thresholding " + self.active_window.name, range_slider.image_data)
@@ -267,7 +267,7 @@ class MainWindow(QMainWindow, UiMainWindow):
     def point_operation_posterization(self):
         image_data = self.active_window.data
         if len(self.active_window.data.shape) > 2:
-            image_data = self.__conversation_to_grayscale(image_data)
+            image_data = self.__conversiton_to_grayscale(image_data)
         range_slider = PointOperationPosterization(image_data)
         if range_slider.exec_():
             self.__add_window("Point operation posterization " + self.active_window.name, range_slider.image_data)
@@ -276,7 +276,7 @@ class MainWindow(QMainWindow, UiMainWindow):
     def point_operation_posterization_lut(self):
         image_data = self.active_window.data
         if len(self.active_window.data.shape) > 2:
-            image_data = self.__conversation_to_grayscale(image_data)
+            image_data = self.__conversiton_to_grayscale(image_data)
         range_slider = PointOperationPosterizationLut(image_data)
         if range_slider.exec_():
             self.__add_window("Point operation posterization LUT " + self.active_window.name, range_slider.image_data)
@@ -284,8 +284,6 @@ class MainWindow(QMainWindow, UiMainWindow):
     @check_active_window
     def blurring_image(self):
         image_data = self.active_window.data
-        if len(self.active_window.data.shape) > 2:
-            image_data = self.__conversation_to_grayscale(image_data)
         blur = Blurring(image_data)
         if blur.exec_():
             self.__add_window("Blurring " + self.active_window.name, blur.image_data)
@@ -293,8 +291,6 @@ class MainWindow(QMainWindow, UiMainWindow):
     @check_active_window
     def edge_detection(self):
         image_data = self.active_window.data
-        if len(self.active_window.data.shape) > 2:
-            image_data = self.__conversation_to_grayscale(image_data)
         edge_detect = EdgeDetection(image_data)
         if edge_detect.exec_():
             self.__add_window("Edge detection " + edge_detect.comboBoxTypes.currentText() + self.active_window.name, edge_detect.image_data)
@@ -302,8 +298,6 @@ class MainWindow(QMainWindow, UiMainWindow):
     @check_active_window
     def linear_sharpening_image(self):
         image_data = self.active_window.data
-        if len(self.active_window.data.shape) > 2:
-            image_data = self.__conversation_to_grayscale(image_data)
         lin_sharp = LinearSharpening(image_data)
         if lin_sharp.exec_():
             self.__add_window("Linear sharpening  " + lin_sharp.comboBoxTypes.currentText() + " "

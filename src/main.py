@@ -212,8 +212,6 @@ class MainWindow(QMainWindow, UiMainWindow):
     @check_active_window
     def stretching(self):
         image_data = self.active_window.data
-        if len(self.active_window.data.shape) > 2:
-            image_data = self.__conversiton_to_grayscale(image_data)
         range_slider = HistogramManipulationStretching(image_data)
         if range_slider.exec_():
             self.__add_window("Stretching " + self.active_window.name, range_slider.image_data)

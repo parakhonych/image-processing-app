@@ -2,6 +2,7 @@ from PyQt5.QtWidgets import QDialog
 from src.UI.ui_range_slider import UiRangeSlider
 from PyQt5.QtGui import QPixmap, QImage
 from numpy import zeros_like
+import cv2
 
 FORMATS = {
     1: QImage.Format_Grayscale8
@@ -21,7 +22,10 @@ class PointOperationThresholding(QDialog, UiRangeSlider):
 
     def update_window(self):
         height, width = self.image_data.shape[:2]
-        image = QImage(self.image_data, width, height, width, FORMATS[self.image_data.dtype.itemsize])
+        if len(self.image_data.shape) < 3:
+            image = QImage(self.image_data, width, height, width, FORMATS[self.image_data.dtype.itemsize])
+        else:
+            image = QImage(self.image_data, width, height, 3 * width, QImage.Format_BGR888)
         self.pixmap = QPixmap(image)
         self.setFixedSize(self.pixmap.width() + 10, self.pixmap.height() + 30)
         self.label_image.setPixmap(self.pixmap)
@@ -29,11 +33,20 @@ class PointOperationThresholding(QDialog, UiRangeSlider):
     def po_thresholding(self):
         value = self.slider_max.value()
         self.label_max.setText("Max: {0}".format(value))
-        img_th = zeros_like(self.image_origin)
-        for h in range(self.image_origin.shape[0]):
-            for w in range(self.image_origin.shape[1]):
-                pixel = self.image_origin[h, w]
-                if pixel > value:
-                    img_th[h, w] = 1
-        self.image_data = img_th*255
+        if len(self.image_data.shape) == 3:
+            b, g, r = cv2.split(self.image_origin)
+
+            _, b_thresh = cv2.threshold(b, value, 255, cv2.THRESH_TRUNC)
+            _, g_thresh = cv2.threshold(g, value, 255, cv2.THRESH_TRUNC)
+            _, r_thresh = cv2.threshold(r, value, 255, cv2.THRESH_TRUNC)
+            img_th = cv2.merge((b_thresh, g_thresh, r_thresh))
+            self.image_data = img_th
+        else:
+            img_th = zeros_like(self.image_origin)
+            for h in range(self.image_origin.shape[0]):
+                for w in range(self.image_origin.shape[1]):
+                    pixel = self.image_origin[h, w]
+                    if pixel > value:
+                        img_th[h, w] = 1
+                    self.image_data = img_th*255
         self.update_window()

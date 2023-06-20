@@ -10,13 +10,14 @@ FORMATS = {
 
 
 class PointOperationThresholding(QDialog, UiRangeSlider):
-    def __init__(self, image_data):
+    def __init__(self, image_data, gray):
         super().__init__()
         self.setup_ui(self)
         self.setWindowTitle("Point Operation Thresholding")
         self.pixmap = None
         self.image_data = image_data
         self.image_origin = image_data
+        self.gray = gray
         self.po_thresholding()
         self.slider_max.valueChanged.connect(self.po_thresholding)
 
@@ -33,7 +34,7 @@ class PointOperationThresholding(QDialog, UiRangeSlider):
     def po_thresholding(self):
         value = self.slider_max.value()
         self.label_max.setText("Max: {0}".format(value))
-        if len(self.image_data.shape) == 3:
+        if not self.gray:
             b, g, r = cv2.split(self.image_origin)
 
             _, b_thresh = cv2.threshold(b, value, 255, cv2.THRESH_TRUNC)
@@ -42,11 +43,6 @@ class PointOperationThresholding(QDialog, UiRangeSlider):
             img_th = cv2.merge((b_thresh, g_thresh, r_thresh))
             self.image_data = img_th
         else:
-            img_th = zeros_like(self.image_origin)
-            for h in range(self.image_origin.shape[0]):
-                for w in range(self.image_origin.shape[1]):
-                    pixel = self.image_origin[h, w]
-                    if pixel > value:
-                        img_th[h, w] = 1
-                    self.image_data = img_th*255
+            _, img_th = cv2.threshold(self.image_origin, value, 255, cv2.THRESH_TRUNC)
+            self.image_data = img_th
         self.update_window()

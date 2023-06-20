@@ -12,7 +12,6 @@ from numpy import zeros, array
 from numpy.ma import masked_equal
 from src.Dialogs import PointOperationThresholding
 from src.Dialogs import PointOperationPosterization
-from src.Dialogs import PointOperationPosterizationLut
 from src.Dialogs import Blurring
 from src.Dialogs import EdgeDetection
 from src.Dialogs import LinearSharpening
@@ -97,7 +96,6 @@ class MainWindow(QMainWindow, UiMainWindow):
         self.actionNegation.triggered.connect(self.negation)
         self.actionThresholding.triggered.connect(self.point_operation_thresholding)
         self.actionPosterize.triggered.connect(self.point_operation_posterization)
-        self.actionPosterize_with_LUT.triggered.connect(self.point_operation_posterization_lut)
 
         # Local operation
         self.actionBlur.triggered.connect(self.blurring_image)
@@ -255,27 +253,16 @@ class MainWindow(QMainWindow, UiMainWindow):
     @check_active_window
     def point_operation_thresholding(self):
         image_data = self.active_window.data
-        range_slider = PointOperationThresholding(image_data)
+        range_slider = PointOperationThresholding(image_data, self.active_window.gray)
         if range_slider.exec_():
             self.__add_window("Point operation thresholding " + self.active_window.name, range_slider.image_data)
 
     @check_active_window
     def point_operation_posterization(self):
         image_data = self.active_window.data
-        if len(self.active_window.data.shape) > 2:
-            image_data = self.__conversiton_to_grayscale(image_data)
-        range_slider = PointOperationPosterization(image_data)
+        range_slider = PointOperationPosterization(image_data, self.active_window.gray)
         if range_slider.exec_():
             self.__add_window("Point operation posterization " + self.active_window.name, range_slider.image_data)
-
-    @check_active_window
-    def point_operation_posterization_lut(self):
-        image_data = self.active_window.data
-        if len(self.active_window.data.shape) > 2:
-            image_data = self.__conversiton_to_grayscale(image_data)
-        range_slider = PointOperationPosterizationLut(image_data)
-        if range_slider.exec_():
-            self.__add_window("Point operation posterization LUT " + self.active_window.name, range_slider.image_data)
 
     @check_active_window
     def blurring_image(self):

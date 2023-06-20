@@ -16,6 +16,7 @@ from src.Dialogs import Blurring
 from src.Dialogs import EdgeDetection
 from src.Dialogs import LinearSharpening
 from src.Dialogs import UniversalMask
+from src.Dialogs import ImageCalculator
 
 
 def check_color_window(method):
@@ -76,7 +77,7 @@ class MainWindow(QMainWindow, UiMainWindow):
         self.actionZoom_Off.triggered.connect(lambda: self.zoom(0))
 
         # Processing menu
-        # Conversation
+        # Conversion
         self.actionBGR_Grayscale.triggered.connect(self.bgr2grayscale)
         self.actionBGR_RGB.triggered.connect(self.bgr2rgb)
         self.actionBGR_HSV.triggered.connect(self.bgr2hsv)
@@ -101,6 +102,8 @@ class MainWindow(QMainWindow, UiMainWindow):
         self.actionEdgeDetection.triggered.connect(self.edge_detection)
         self.actionLinearSharpening.triggered.connect(self.linear_sharpening_image)
         self.actionUniversal.triggered.connect(self.universal_mask)
+
+        self.actionImage_calculator.triggered.connect(self.image_calculation)
 
         # Analyzing menu
         self.actionHistogram.triggered.connect(self.histogram)
@@ -292,6 +295,12 @@ class MainWindow(QMainWindow, UiMainWindow):
         UniMask = UniversalMask(image_data, self.active_window.gray)
         if UniMask.exec_():
             self.__add_window("Universal mask" + self.active_window.name, UniMask.image_data)
+
+    @check_active_window
+    def image_calculation(self):
+        ImageCal = ImageCalculator(self.windows)
+        if ImageCal.exec_():
+            self.__add_window("Universal mask" + self.active_window.name, ImageCal.image_data)
 
 
 if __name__ == '__main__':

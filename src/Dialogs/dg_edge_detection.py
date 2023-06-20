@@ -2,6 +2,7 @@ from PyQt5.QtWidgets import QDialog
 from src.UI.ui_combo_boxes import ui_combo_boxes
 from PyQt5.QtGui import QPixmap, QImage
 import cv2
+import numpy as np
 
 FORMATS = {
     1: QImage.Format_Grayscale8
@@ -15,7 +16,9 @@ def laplacian_edge_detection(image_origin, kernel):
 def sobel_edge_detection(image_origin, kernel):
     sobelx = cv2.Sobel(image_origin, cv2.CV_8U, 1, 0, ksize=kernel)
     sobely = cv2.Sobel(image_origin, cv2.CV_8U, 0, 1, ksize=kernel)
-    return cv2.hconcat((sobelx, sobely))
+    combined_gradient = cv2.addWeighted(sobelx.astype(np.float32), 0.5, sobely.astype(np.float32), 0.5, 0)
+    combined_gradient = np.clip(combined_gradient, 0, 255).astype(np.uint8)
+    return combined_gradient
 
 def canny_edge_detection(image_origin, kernel):
     return cv2.Canny(image_origin, 100, 200)

@@ -5,3 +5,4 @@ from .dg_range_slider_posterization import PointOperationPosterization
 from .dg_blurring import Blurring
 from .dg_edge_detection import EdgeDetection
 from .dg_linear_sharpening import LinearSharpening
+from .dg_universal_mask import UniversalMask

@@ -10,9 +10,9 @@ FORMATS = {
 
 
 MASK = {
-    "Laplace mask 1": np.array([[ 0,-1, 0],[-1, 5,-1],[ 0,-1, 0]]),
-    "Laplace mask 2": np.array([[-1,-1,-1],[-1, 9,-1],[-1,-1,-1]]),
-    "Laplace mask 3": np.array([[ 1,-2, 1],[-2, 5,-2],[ 1,-2, 1]])
+    "Laplace mask 1": np.array([[0, -1, 0], [-1, 5, -1], [0, -1, 0]]),
+    "Laplace mask 2": np.array([[-1, -1, -1], [-1, 9, -1], [-1, -1, -1]]),
+    "Laplace mask 3": np.array([[1, -2, 1], [-2, 5, -2], [1, -2, 1]])
 }
 
 

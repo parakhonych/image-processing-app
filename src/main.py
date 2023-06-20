@@ -15,8 +15,7 @@ from src.Dialogs import PointOperationPosterization
 from src.Dialogs import Blurring
 from src.Dialogs import EdgeDetection
 from src.Dialogs import LinearSharpening
-
-
+from src.Dialogs import UniversalMask
 
 
 def check_color_window(method):
@@ -101,6 +100,7 @@ class MainWindow(QMainWindow, UiMainWindow):
         self.actionBlur.triggered.connect(self.blurring_image)
         self.actionEdgeDetection.triggered.connect(self.edge_detection)
         self.actionLinearSharpening.triggered.connect(self.linear_sharpening_image)
+        self.actionUniversal.triggered.connect(self.universal_mask)
 
         # Analyzing menu
         self.actionHistogram.triggered.connect(self.histogram)
@@ -286,9 +286,12 @@ class MainWindow(QMainWindow, UiMainWindow):
             self.__add_window("Linear sharpening  " + lin_sharp.comboBoxTypes.currentText() + " "
                               + self.active_window.name, lin_sharp.image_data)
 
-
-
-
+    @check_active_window
+    def universal_mask(self):
+        image_data = self.active_window.data
+        UniMask = UniversalMask(image_data, self.active_window.gray)
+        if UniMask.exec_():
+            self.__add_window("Universal mask" + self.active_window.name, UniMask.image_data)
 
 
 if __name__ == '__main__':

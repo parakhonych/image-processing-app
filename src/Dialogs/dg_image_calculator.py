@@ -1,6 +1,7 @@
 from PyQt5.QtWidgets import QDialog
 from src.UI.ui_image_calculator import UiImageCalculator
 from PyQt5.QtGui import QPixmap, QImage
+from PyQt5.QtCore import Qt
 import cv2
 
 FORMATS = {
@@ -75,11 +76,27 @@ class ImageCalculator(QDialog, UiImageCalculator):
         self.label_image.setPixmap(self.pixmap)
 
     def calculation(self):
-        image1 = self.windows[int(self.cB_image1.currentText()[0])].data
-        image2 = self.windows[int(self.cB_image2.currentText()[0])].data
+        image1 = self.windows[int(self.cB_image1.currentText()[0])]
+        image2 = self.windows[int(self.cB_image2.currentText()[0])]
         operation = self.cB_operations.currentText()
-        if image1.shape[:2] != image2.shape[:2]:
-            image2 = cv2.resize(image2, image1.shape)
-        self.image_data = OPERATIONS[operation](image1, image2)
-        self.update_window()
+
+        if image1.gray and image2.gray or not image1.gray and not image2.gray:
+            h1, w1 = image1.data.shape[:2]
+            h2, w2 = image2.data.shape[:2]
+            if h1+w1 > h2+w2:
+                image2.data = cv2.resize(image2.data, image1.data.shape[:2])
+                self.image_data = OPERATIONS[operation](image1.data, image2.data)
+            elif h1+w1 < h2+w2:
+                image1.data = cv2.resize(image1.data, image2.data.shape[:2])
+                self.image_data = OPERATIONS[operation](image2.data, image1.data)
+            else:
+                self.image_data = OPERATIONS[operation](image1.data, image2.data)
+            self.update_window()
+
+        else:
+            self.image_data = image1.data
+            self.label_image.setText("Images must be of the same color type")
+            self.setFixedSize(300, 150)
+            self.label_image.setAlignment(Qt.AlignCenter)
+
 

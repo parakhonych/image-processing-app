@@ -300,7 +300,7 @@ class MainWindow(QMainWindow, UiMainWindow):
     def image_calculation(self):
         ImageCal = ImageCalculator(self.windows)
         if ImageCal.exec_():
-            self.__add_window("Universal mask" + self.active_window.name, ImageCal.image_data)
+            self.__add_window("Image calculator " + self.active_window.name, ImageCal.image_data)
 
 
 if __name__ == '__main__':

@@ -17,7 +17,7 @@ from src.Dialogs import EdgeDetection
 from src.Dialogs import LinearSharpening
 from src.Dialogs import UniversalMask
 from src.Dialogs import ImageCalculator
-
+from src.Dialogs import Morphological
 
 def check_color_window(method):
     def wrapper(self):
@@ -102,6 +102,7 @@ class MainWindow(QMainWindow, UiMainWindow):
         self.actionEdgeDetection.triggered.connect(self.edge_detection)
         self.actionLinearSharpening.triggered.connect(self.linear_sharpening_image)
         self.actionUniversal.triggered.connect(self.universal_mask)
+        self.actionMorphology.triggered.connect(self.morphology)
 
         self.actionImage_calculator.triggered.connect(self.image_calculation)
 
@@ -301,6 +302,12 @@ class MainWindow(QMainWindow, UiMainWindow):
         ImageCal = ImageCalculator(self.windows)
         if ImageCal.exec_():
             self.__add_window("Image calculator " + self.active_window.name, ImageCal.image_data)
+
+    @check_active_window
+    def morphology(self):
+        ImageCal = Morphological(self.active_window.data)
+        if ImageCal.exec_():
+            self.__add_window("Morph " + self.active_window.name, ImageCal.image_data)
 
 
 if __name__ == '__main__':

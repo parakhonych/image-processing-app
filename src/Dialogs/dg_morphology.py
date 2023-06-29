@@ -19,23 +19,23 @@ def kt_cross(i):
 
 
 def kt_diamond(i):
-    return np.uint8(np.add.outer(*[np.i_[:i, i:-1:-1]]*2) >= i)
+    return np.uint8(np.add.outer(*[np.r_[:i, i:-1:-1]] * 2) >= i)
 
 
-def erosion(data_img, kernel, ):
-    return cv2.erode(data_img, kernel, iterations=2, borderType=cv2.BORDER_REPLICATE)
+def erosion(data_img, kernel, border_type):
+    return cv2.erode(data_img, kernel, iterations=2, borderType=border_type)
 
 
-def dilation(data_img, kernel, ):
-    return cv2.dilate(data_img, kernel, iterations=2, borderType=cv2.BORDER_REPLICATE)
+def dilation(data_img, kernel, border_type):
+    return cv2.dilate(data_img, kernel, iterations=2, borderType=border_type)
 
 
-def morph_open(data_img, kernel, ):
-    return cv2.morphologyEx(data_img, cv2.MORPH_OPEN, kernel, borderType=cv2.BORDER_REPLICATE)
+def morph_open(data_img, kernel, border_type):
+    return cv2.morphologyEx(data_img, cv2.MORPH_OPEN, kernel, borderType=border_type)
 
 
-def morph_close(data_img, kernel,):
-    return cv2.morphologyEx(data_img, cv2.MORPH_CLOSE, kernel, borderType=cv2.BORDER_REPLICATE)
+def morph_close(data_img, kernel, border_type):
+    return cv2.morphologyEx(data_img, cv2.MORPH_CLOSE, kernel, borderType=border_type)
 
 
 FORMATS = {
@@ -51,7 +51,7 @@ KERNEL_TYPES = {
 }
 
 OPERATIONS = {
-    "Erode" : erosion,
+    "Erode": erosion,
     "Dilate": dilation,
     "Morph Open": morph_open,
     "Morph Close": morph_close,
@@ -61,7 +61,6 @@ BORDERS = {
     'BORDER_CONSTANT': cv2.BORDER_CONSTANT,
     'BORDER_REFLECT': cv2.BORDER_REFLECT,
 }
-
 
 
 class Morphological(QDialog, UIMorphology):
@@ -78,12 +77,13 @@ class Morphological(QDialog, UIMorphology):
         self.kernel = self.kernel_create()
         self.processing_image()
         self.cB_operations.currentIndexChanged.connect(self.processing_image)
-        self.cB_kernel_size.currentIndexChanged.connect(self.processing_image)
-        self.cB_shape_kernel.currentIndexChanged.connect(self.processing_image)
+        self.cB_kernel_size.currentIndexChanged.connect(self.kernel_create)
+        self.cB_shape_kernel.currentIndexChanged.connect(self.kernel_create)
         self.cB_border_type.currentIndexChanged.connect(self.processing_image)
 
     def kernel_create(self):
-        pass
+        self.kernel = KERNEL_TYPES[self.cB_shape_kernel.currentText()](int(self.cB_kernel_size.currentText()[0]))
+        self.processing_image()
 
     def fill_combo_boxes(self):
         for key in OPERATIONS.keys():
@@ -95,7 +95,7 @@ class Morphological(QDialog, UIMorphology):
         for key in BORDERS.keys():
             self.cB_border_type.addItem(key)
 
-        for key in range(3, 12):
+        for key in range(3, 10):
             self.cB_kernel_size.addItem(f"{key} x {key}")
 
     def update_window(self):
@@ -109,6 +109,8 @@ class Morphological(QDialog, UIMorphology):
         self.label_image.setPixmap(self.pixmap)
 
     def processing_image(self):
+        border_type = BORDERS[self.cB_border_type.currentText()]
+        self.image_data = OPERATIONS[self.cB_operations.currentText()](self.origin_data, self.kernel, border_type)
         self.update_window()
 
 

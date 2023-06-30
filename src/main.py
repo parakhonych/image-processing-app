@@ -259,7 +259,7 @@ class MainWindow(QMainWindow, UiMainWindow):
         image_data = self.active_window.data
         range_slider = PointOperationThresholding(image_data, self.active_window.gray)
         if range_slider.exec_():
-            self.__add_window("Point operation thresholding " + self.active_window.name, range_slider.image_data)
+            self.__add_window("Thresholding " + self.active_window.name, range_slider.image_data)
 
     @check_active_window
     def point_operation_posterization(self):

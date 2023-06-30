@@ -1,6 +1,9 @@
 import cv2
 from os import path as os_path
 from sys import argv, path
+
+import matplotlib.pyplot as plt
+
 path.append(os_path.abspath(os_path.join(os_path.dirname(__file__), os_path.pardir)))
 from PyQt5.QtWidgets import QMainWindow, QApplication, QFileDialog, QMessageBox
 from src.UI.ui_main_window import UiMainWindow
@@ -9,6 +12,7 @@ from src.Dialogs import TextInput
 from src.subWindows.sub_histogram_window import SubHistogram
 from src.Dialogs import HistogramManipulationStretching
 from numpy import zeros, array
+import numpy as np
 from numpy.ma import masked_equal
 from src.Dialogs import PointOperationThresholding
 from src.Dialogs import PointOperationPosterization
@@ -105,7 +109,7 @@ class MainWindow(QMainWindow, UiMainWindow):
         self.actionMorphology.triggered.connect(self.morphology)
 
         self.actionImage_calculator.triggered.connect(self.image_calculation)
-
+        self.actionWatershed.triggered.connect(self.watershed)
         # Analyzing menu
         self.actionHistogram.triggered.connect(self.histogram)
 
@@ -308,6 +312,26 @@ class MainWindow(QMainWindow, UiMainWindow):
         ImageCal = Morphological(self.active_window.data)
         if ImageCal.exec_():
             self.__add_window("Morph " + self.active_window.name, ImageCal.image_data)
+
+    @check_color_window
+    def watershed(self):
+        gray_image = cv2.cvtColor(self.active_window.data, cv2.COLOR_BGR2GRAY)
+        _, thresh = cv2.threshold(gray_image, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
+        kernel = np.ones((3, 3), np.uint8)
+        opening = cv2.morphologyEx(thresh, cv2.MORPH_OPEN, kernel, iterations=1)
+        distance_transform = cv2.distanceTransform(opening, cv2.DIST_L2, 5)
+        _, thresholding = cv2.threshold(distance_transform, 0.5 * distance_transform.max(), 255, 0)
+        thresholding = np.uint8(thresholding)
+        substraction = cv2.subtract(cv2.dilate(opening, kernel, iterations=1), thresholding)
+        _, marks = cv2.connectedComponents(thresholding)
+        marks = marks + 1
+        marks[substraction == 255] = 0
+        markers2 = cv2.watershed(self.active_window.data, marks)
+        gray_image[markers2 == -1] = 255
+        self.active_window.data[markers2 == -1] = [255, 0, 0]
+        self.__add_window("Watershed " + self.active_window.name,
+                          cv2.convertScaleAbs(cv2.applyColorMap(np.uint8(markers2 * 10), cv2.COLORMAP_JET)))
+        QMessageBox.information(self, "Info", str(np.max(markers2)) + " objects have been found")
 
 
 if __name__ == '__main__':

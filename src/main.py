@@ -22,6 +22,7 @@ from src.Dialogs import LinearSharpening
 from src.Dialogs import UniversalMask
 from src.Dialogs import ImageCalculator
 from src.Dialogs import Morphological
+from src.Dialogs import ObjectDetails
 
 def check_color_window(method):
     def wrapper(self):
@@ -112,6 +113,7 @@ class MainWindow(QMainWindow, UiMainWindow):
         self.actionWatershed.triggered.connect(self.watershed)
         # Analyzing menu
         self.actionHistogram.triggered.connect(self.histogram)
+        self.actionObjectDetails.triggered.connect(self.finding_object_details)
 
     def __add_window(self, image_name, image_data):
         self.window_id += 1
@@ -313,6 +315,7 @@ class MainWindow(QMainWindow, UiMainWindow):
         if ImageCal.exec_():
             self.__add_window("Morph " + self.active_window.name, ImageCal.image_data)
 
+    @check_active_window
     @check_color_window
     def watershed(self):
         gray_image = cv2.cvtColor(self.active_window.data, cv2.COLOR_BGR2GRAY)
@@ -332,6 +335,13 @@ class MainWindow(QMainWindow, UiMainWindow):
         self.__add_window("Watershed " + self.active_window.name,
                           cv2.convertScaleAbs(cv2.applyColorMap(np.uint8(markers2 * 10), cv2.COLORMAP_JET)))
         QMessageBox.information(self, "Info", str(np.max(markers2)) + " objects have been found")
+
+    @check_active_window
+    def finding_object_details(self):
+        ObjDet = ObjectDetails(self.active_window.data)
+        ObjDet.exec_()
+
+
 
 
 if __name__ == '__main__':

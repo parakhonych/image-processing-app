@@ -8,3 +8,4 @@ from .dg_linear_sharpening import LinearSharpening
 from .dg_universal_mask import UniversalMask
 from .dg_image_calculator import ImageCalculator
 from .dg_morphology import Morphological
+from .dg_object_details import ObjectDetails

@@ -43,8 +43,7 @@ class PointOperationThresholding(QDialog, UiRangeSliderThresholding):
     def fill_combo_boxes(self):
         for key in OPERATIONS.keys():
             self.cB_operations.addItem(key)
-        #for key in range(3, 99, 2):
-            #self.cb_block_size.addItem(str(key))
+
 
     def update_window(self):
         height, width = self.image_data.shape[:2]

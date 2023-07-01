@@ -115,6 +115,11 @@ class MainWindow(QMainWindow, UiMainWindow):
         self.actionHistogram.triggered.connect(self.histogram)
         self.actionObjectDetails.triggered.connect(self.finding_object_details)
 
+        # Info menu
+        self.actionAbout.triggered.connect(self.about_program)
+        self.actionAuthor.triggered.connect(self.author)
+        self.actionHelp.triggered.connect(self.helping)
+
     def __add_window(self, image_name, image_data):
         self.window_id += 1
         window = Image(self.window_id, image_name, image_data)
@@ -338,8 +343,53 @@ class MainWindow(QMainWindow, UiMainWindow):
 
     @check_active_window
     def finding_object_details(self):
-        ObjDet = ObjectDetails(self.active_window.data)
+        if self.active_window.gray:
+            ObjDet = ObjectDetails(self.active_window.data)
+        else:
+            ObjDet = ObjectDetails(self.__conversiton_to_grayscale(self.active_window.data))
         ObjDet.exec_()
+
+    def helping(self):
+        text = """              
+                <p style="text-align: center">
+                    <table>
+                        <tr><td>Application to proccesing image</td></tr>
+                        <tr><td></td></tr>
+                        <tr><td></td></tr>
+                        <tr><td></td></tr>
+                        <tr><td> </td></tr>
+                        <tr><td></td></tr>     
+                    </table>
+               """
+        QMessageBox.information(self, "About", text)
+
+    def about_program(self):
+        text = """              
+                                                    <p style="text-align: center">
+                                                  <table>
+                                                     <tr><td>Program name:</td><td>Image processing app</td></tr>
+                                                     <tr><td>Version:</td><td>1.0.0</td></tr>
+                                                     <tr><td>Icons:</td><td>link</td></tr>
+                                                     <tr><td>License:</td><td><a href='https://github.com/vparakhonych/image-processing-app/blob/main/LICENSE'>Apache 2.0</a></td></tr>
+                                                     </table>
+                                                 """
+
+        QMessageBox.information(self, "About", text)
+
+    def author(self):
+        text = """              
+                                        <p style="text-align: center">
+                                       <table>
+                                           <tr><td>Author:</td><td>Volodymyr Parakhonych</td></tr>
+                                           <tr><td>GitHub:</td><td><a href='https://github.com/vparakhonych'> vparakhonych </a></td></tr>
+                                           <tr><td>Linkedin:</td><td><a href='https://www.linkedin.com/in/parakhonych/'>parakhonych</a></td></tr>
+                                       </table>
+                                      """
+
+        QMessageBox.information(self, "Author", text)
+
+
+
 
 
 

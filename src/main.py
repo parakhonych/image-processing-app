@@ -23,6 +23,7 @@ from src.Dialogs import UniversalMask
 from src.Dialogs import ImageCalculator
 from src.Dialogs import Morphological
 from src.Dialogs import ObjectDetails
+from src.Dialogs import NeuralTransfer
 
 def check_color_window(method):
     def wrapper(self):
@@ -114,6 +115,9 @@ class MainWindow(QMainWindow, UiMainWindow):
         # Analyzing menu
         self.actionHistogram.triggered.connect(self.histogram)
         self.actionObjectDetails.triggered.connect(self.finding_object_details)
+
+        # AI
+        self.actionNeural_transfer_of_style.triggered.connect(self.neural_transfer)
 
         # Info menu
         self.actionAbout.triggered.connect(self.about_program)
@@ -212,7 +216,7 @@ class MainWindow(QMainWindow, UiMainWindow):
 
     @check_active_window
     def resizing(self):
-        self.__add_window("Size 256 x 256 " + self.active_window.name, cv2.resize(self.active_window.data, (256, 256)))
+        self.__add_window("Size 224 x 224 " + self.active_window.name, cv2.resize(self.active_window.data, (224, 224)))
 
     @check_active_window
     @check_color_window
@@ -348,6 +352,11 @@ class MainWindow(QMainWindow, UiMainWindow):
         else:
             ObjDet = ObjectDetails(self.__conversiton_to_grayscale(self.active_window.data))
         ObjDet.exec_()
+    @check_active_window
+    def neural_transfer(self):
+        NeuralTransferStyle = NeuralTransfer(self.windows)
+        if NeuralTransferStyle.exec_():
+            self.__add_window("Transfer style", NeuralTransfer.image_result)
 
     def helping(self):
         text = """              

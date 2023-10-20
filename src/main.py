@@ -356,7 +356,7 @@ class MainWindow(QMainWindow, UiMainWindow):
     def neural_transfer(self):
         NeuralTransferStyle = NeuralTransfer(self.windows)
         if NeuralTransferStyle.exec_():
-            self.__add_window("Transfer style", NeuralTransfer.image_result)
+            self.__add_window("Transfer style", NeuralTransferStyle.image_result)
 
     def helping(self):
         text = """              
@@ -396,11 +396,6 @@ class MainWindow(QMainWindow, UiMainWindow):
                                       """
 
         QMessageBox.information(self, "Author", text)
-
-
-
-
-
 
 
 if __name__ == '__main__':

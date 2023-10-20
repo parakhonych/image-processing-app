@@ -1,6 +1,7 @@
 from PyQt5.QtWidgets import QDialog, QDialogButtonBox
 from src.UI.ui_neural_transfer import UiNeuralTransfer
 from PyQt5.QtGui import QPixmap, QImage
+from src.UI.ui_ai_proccesing import UiProgressBarDialog
 from PyQt5.QtCore import Qt
 import cv2
 import numpy as np
@@ -27,9 +28,11 @@ class NeuralTransfer(QDialog, UiNeuralTransfer):
         self.image_data2 = None
         self.image_name = None
         self.image_result = None
+        self.calculation()
         self.cB_image1.currentIndexChanged.connect(self.calculation)
         self.cB_image2.currentIndexChanged.connect(self.calculation)
         self.buttons.accepted.connect(self.transfer)
+        self.buttons.rejected.connect(self.reject)
 
     def fill_combo_boxes(self):
         for key in self.windows:
@@ -67,8 +70,11 @@ class NeuralTransfer(QDialog, UiNeuralTransfer):
             self.label_image2.setText("Use the resize function")
             self.buttons.button(QDialogButtonBox.Ok).setEnabled(False)
     def transfer(self):
-        img = cv2.cvtColor(self.image_data1, cv2.COLOR_BGR2RGB)
-        img_style = cv2.cvtColor(self.image_data2, cv2.COLOR_BGR2RGB)
-        self.accept()
+        source_image = cv2.cvtColor(self.image_data1, cv2.COLOR_BGR2RGB)
+        style_image = cv2.cvtColor(self.image_data2, cv2.COLOR_BGR2RGB)
+        transef = UiProgressBarDialog()
+        if transef.exec_():
+            print("good")
+        #self.accept()
 
 

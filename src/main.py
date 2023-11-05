@@ -352,11 +352,12 @@ class MainWindow(QMainWindow, UiMainWindow):
         else:
             ObjDet = ObjectDetails(self.__conversiton_to_grayscale(self.active_window.data))
         ObjDet.exec_()
+
     @check_active_window
     def neural_transfer(self):
         NeuralTransferStyle = NeuralTransfer(self.windows)
         if NeuralTransferStyle.exec_():
-            self.__add_window("Transfer style", NeuralTransferStyle.image_result)
+            self.__add_window("Transfer style.jpg", NeuralTransferStyle.image_result)
 
     def helping(self):
         text = """              
@@ -379,7 +380,7 @@ class MainWindow(QMainWindow, UiMainWindow):
                                                      <tr><td>Program name:</td><td>Image processing app</td></tr>
                                                      <tr><td>Version:</td><td>1.0.0</td></tr>
                                                      <tr><td>Icons:</td><td>link</td></tr>
-                                                     <tr><td>License:</td><td><a href='https://github.com/vparakhonych/image-processing-app/blob/main/LICENSE'>Apache 2.0</a></td></tr>
+                                                     <tr><td>License:</td><td><a href=''>Apache 2.0</a></td</tr>
                                                      </table>
                                                  """
 
@@ -390,7 +391,7 @@ class MainWindow(QMainWindow, UiMainWindow):
                                         <p style="text-align: center">
                                        <table>
                                            <tr><td>Author:</td><td>Volodymyr Parakhonych</td></tr>
-                                           <tr><td>GitHub:</td><td><a href='https://github.com/vparakhonych'> vparakhonych </a></td></tr>
+                                           <tr><td>GitHub:</td><td><a href='https://github.com/parakhonych'> parakhonych </a></td></tr>
                                            <tr><td>Linkedin:</td><td><a href='https://www.linkedin.com/in/parakhonych/'>parakhonych</a></td></tr>
                                        </table>
                                       """

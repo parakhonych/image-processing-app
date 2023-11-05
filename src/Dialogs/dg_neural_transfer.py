@@ -56,6 +56,7 @@ class NeuralTransfer(QDialog, UiNeuralTransfer):
     def calculation(self):
         image_data1 = self.windows[int(self.cB_image1.currentText()[0])].data
         image_data2 = self.windows[int(self.cB_image2.currentText()[0])].data
+        self.image_name = self.cB_image1.currentText()[2:]
         if image_data1.shape[:2] == (224, 224) and image_data2.shape[:2] == (224, 224):
             self.image_data1 = image_data1
             self.image_data2 = image_data2
@@ -71,7 +72,6 @@ class NeuralTransfer(QDialog, UiNeuralTransfer):
         style_image = cv2.cvtColor(self.image_data2, cv2.COLOR_BGR2RGB)
         style_transfer = ProgressDialog(source_image, style_image)
         if style_transfer.exec_():
-            self.image_name = self.self.windows[int(self.cB_image1.currentText()[0])].name
             self.image_result = style_transfer.best_image
             self.accept()
 

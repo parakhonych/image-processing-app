@@ -355,9 +355,9 @@ class MainWindow(QMainWindow, UiMainWindow):
 
     @check_active_window
     def neural_transfer(self):
-        NeuralTransferStyle = NeuralTransfer(self.windows)
-        if NeuralTransferStyle.exec_():
-            self.__add_window("Transfer style.jpg", NeuralTransferStyle.image_result)
+        neural_transfer_style = NeuralTransfer(self.windows)
+        if neural_transfer_style.exec_():
+            self.__add_window(neural_transfer_style.image_name + " transfer style", neural_transfer_style.image_result)
 
     def helping(self):
         text = """              

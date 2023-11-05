@@ -1,13 +1,9 @@
 from PyQt5.QtWidgets import QDialog, QDialogButtonBox
 from src.UI.ui_neural_transfer import UiNeuralTransfer
 from PyQt5.QtGui import QPixmap, QImage
-from src.UI.ui_ai_proccesing import UiProgressBarDialog
-from PyQt5.QtCore import Qt
+from src.UI.ui_ai_proccesing import ProgressDialog
 import cv2
-import numpy as np
-import matplotlib.pyplot as plt
-import tensorflow as tf
-from tensorflow import keras
+
 
 FORMATS = {
     1: QImage.Format_Grayscale8
@@ -69,12 +65,13 @@ class NeuralTransfer(QDialog, UiNeuralTransfer):
             self.label_image1.setText("The picture must have a size of 224x224")
             self.label_image2.setText("Use the resize function")
             self.buttons.button(QDialogButtonBox.Ok).setEnabled(False)
+
     def transfer(self):
         source_image = cv2.cvtColor(self.image_data1, cv2.COLOR_BGR2RGB)
         style_image = cv2.cvtColor(self.image_data2, cv2.COLOR_BGR2RGB)
-        transef = UiProgressBarDialog()
-        if transef.exec_():
-            print("good")
-        #self.accept()
-
+        style_transfer = ProgressDialog(source_image, style_image)
+        if style_transfer.exec_():
+            self.image_name = self.self.windows[int(self.cB_image1.currentText()[0])].name
+            self.image_result = style_transfer.best_image
+            self.accept()
 

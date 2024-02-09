@@ -2,8 +2,6 @@ import cv2
 from os import path as os_path
 from sys import argv, path
 
-import matplotlib.pyplot as plt
-
 path.append(os_path.abspath(os_path.join(os_path.dirname(__file__), os_path.pardir)))
 from PyQt5.QtWidgets import QMainWindow, QApplication, QFileDialog, QMessageBox
 from src.UI.ui_main_window import UiMainWindow
@@ -24,6 +22,7 @@ from src.Dialogs import ImageCalculator
 from src.Dialogs import Morphological
 from src.Dialogs import ObjectDetails
 from src.Dialogs import NeuralTransfer
+
 
 def check_color_window(method):
     def wrapper(self):

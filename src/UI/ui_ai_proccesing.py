@@ -1,9 +1,10 @@
 import matplotlib.pyplot as plt
 from PyQt5.QtCore import QThread, pyqtSignal
-from PyQt5.QtWidgets import QDialog, QProgressBar, QPushButton, QVBoxLayout
+from PyQt5.QtWidgets import QDialog, QProgressBar, QPushButton, QVBoxLayout, QLabel
 import numpy as np
 import tensorflow as tf
 from tensorflow import keras
+from PyQt5.QtGui import QPixmap, QImage
 
 
 def count_gram_matrix(tensor):
@@ -23,13 +24,14 @@ class WorkerThread(QThread):
         self.style_image = image_matrix2
         self.best_image = None
         self.stop_request = False
-        self.epoch = 1000
+        self.epoch = 3000
         self.one_per_cent = self.epoch / 100
 
     def run(self):
+
         vgg19 = keras.applications.vgg19.VGG19(include_top=False, weights='imagenet')
         vgg19.trainable = False
-
+        print(vgg19.summary())
         content_layer = 'block5_conv4'
 
         list_style_layers = ['block1_conv1', 'block1_conv2',
@@ -39,6 +41,7 @@ class WorkerThread(QThread):
                              'block5_conv1', 'block5_conv2', 'block5_conv3']
 
         count_list_of_style_layers = len(list_style_layers)
+
         outputs = [vgg19.get_layer(elem).output for elem in list_style_layers] + [vgg19.get_layer(content_layer).output]
         model = keras.models.Model(vgg19.input, outputs)
         for layer in model.layers:
@@ -55,10 +58,10 @@ class WorkerThread(QThread):
 
         gram_matrix_style_image = [count_gram_matrix(style_feature) for style_feature in map_style_features]
 
-        working_image = tf.Variable(np.copy(processed_image_content), dtype=tf.float32)
+        self.working_image = tf.Variable(np.copy(processed_image_content), dtype=tf.float32)
 
         opt = tf.compat.v1.train.AdamOptimizer(learning_rate=2, beta1=0.99, epsilon=1e-1)
-        j_min = float('inf')
+        l_min = float('inf')
         min_values = -np.array([103.939, 116.779, 123.68])
         max_values = 255 - np.array([103.939, 116.779, 123.68])
 
@@ -66,41 +69,37 @@ class WorkerThread(QThread):
             if self.stop_request:
                 break
             with tf.GradientTape() as tape:
-                target_image_features = model(working_image)
+                target_image_features = model(self.working_image)
 
                 style_target_image_features = target_image_features[:count_list_of_style_layers]
                 content_target_image_features = target_image_features[count_list_of_style_layers:]
 
-                j_style = 0
-                j_content = 0
+                l_style = 0
+                l_content = 0
 
                 # Count loss in style
-                lambda_j_s = 1.0 / float(count_list_of_style_layers)
+                lambda_l_s = 1.0 / float(count_list_of_style_layers)
                 for G_S, G_P in zip(gram_matrix_style_image, style_target_image_features):
-                    j_style += lambda_j_s * tf.reduce_mean(tf.square(count_gram_matrix(G_P[0]) - G_S))
+                    l_style += lambda_l_s * tf.reduce_mean(tf.square(count_gram_matrix(G_P[0]) - G_S))
 
                 # Count loss in content
-                lambda_j_c = 1.0
-                j_content += lambda_j_c * tf.reduce_mean(
+                lambda_l_c = 1.0
+                l_content += lambda_l_c * tf.reduce_mean(
                     tf.square(content_target_image_features[0] - map_content_features))
 
-                j_style *= beta
-                j_content *= alpha
+                loss_main = alpha*l_content + beta*l_style
 
-                j_main = j_style + j_content
-
-            grads = tape.gradient(j_main, working_image)
-            opt.apply_gradients([(grads, working_image)])
-            clipped = tf.clip_by_value(working_image, min_values, max_values)
-            working_image.assign(clipped)
-            if j_main < j_min:
-                j_min = j_main
-                self.best_image = working_image
+            grads = tape.gradient(loss_main, self.working_image)
+            opt.apply_gradients([(grads, self.working_image)])
+            clipped = tf.clip_by_value(self.working_image, min_values, max_values)
+            self.working_image.assign(clipped)
+            if loss_main < l_min:
+                l_min = loss_main
+                self.best_image = self.working_image
                 print(f'iter {i}')
 
             per_cent = int(i // self.one_per_cent)
             self.progress_signal.emit(per_cent)
-
 
         self.best_image = np.squeeze(self.best_image.numpy(), 0)
         self.best_image[:, :, 0] += 103.939
@@ -116,11 +115,12 @@ class ProgressDialog(QDialog):
     def __init__(self, image_matrix1, image_matrix2):
         super().__init__()
 
+        self.label_preview = QLabel()
         self.setWindowTitle("Progress image processing")
         self.setGeometry(100, 100, 300, 120)
         self.best_image = None
         self.layout = QVBoxLayout()
-
+        self.layout.addWidget(self.label_preview)
         self.progress_bar = QProgressBar()
         self.progress_bar.setValue(0)
         self.layout.addWidget(self.progress_bar)
@@ -140,6 +140,16 @@ class ProgressDialog(QDialog):
 
     def update_progress(self, value):
         self.progress_bar.setValue(value)
+        self.best_image = self.worker_thread.working_image
+        self.best_image = np.squeeze(self.best_image.numpy(), 0)
+        self.best_image[:, :, 0] += 103.939
+        self.best_image[:, :, 1] += 116.779
+        self.best_image[:, :, 2] += 123.68
+        self.best_image = np.clip(self.best_image, 0, 255).astype('uint8')
+        image = QImage(self.best_image, 224, 224, 3 * 224, QImage.Format_BGR888)
+        self.pixmap_preview = QPixmap(image)
+        self.setFixedSize(self.pixmap_preview.width() + 10, self.pixmap_preview.height() + 30)
+        self.label_preview.setPixmap(self.pixmap_preview)
         if value == 100:
             self.best_image = self.worker_thread.best_image
             self.accept()

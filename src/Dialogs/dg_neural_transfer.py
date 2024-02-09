@@ -14,7 +14,7 @@ class NeuralTransfer(QDialog, UiNeuralTransfer):
     def __init__(self, windows):
         super().__init__()
         self.setup_ui(self)
-        self.setWindowTitle("Image Calculator")
+        self.setWindowTitle("Neural transfer of style")
         self.pixmap1 = None
         self.pixmap2 = None
         self.windows = windows

@@ -13,6 +13,38 @@
 - <span style="color: red;">&#x2716;</span> Adding Hotkeys
 - <span style="color: red;">&#x2716;</span> Adding language selection to the settings
 
+
+# Test results
+Test 1
+
+![image1]
+
+Test 2
+
+![image2]
+
+Test 3
+
+![image3]
+
+Test 4
+
+![image4]
+
+Test 5
+
+![image5]
+
+Test 6
+
+![image6]
+
+Test 7
+
+![image7]:
+
+
+
 # Image processing app
 Graphical application for image processing with implementation of neural networks
 
@@ -43,34 +75,6 @@ $ cd src
 $ python main.py
 ```
 
-# Test results
-Test 1
-
-![image1]
-
-Test 2
-
-![image2]
-
-Test 3
-
-![image3]
-
-Test 4
-
-![image4]
-
-Test 5
-
-![image5]
-
-Test 6
-
-![image6]
-
-Test 7
-
-![image7]:
 
 
 
